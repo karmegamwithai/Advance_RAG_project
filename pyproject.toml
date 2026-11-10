@@ -1,31 +1,17 @@
 [project]
-name = "advance-rag-project"
+name = "flask-rag"
 version = "0.1.0"
-description = "Add your description here"
+description = "Flask RAG application using MongoDB Atlas Vector Search and Gemini"
 readme = "README.md"
-authors = [
-    { name = "KarmegamJ", email = "karmegamwithai@gmail.com" }
-]
 requires-python = ">=3.10"
 dependencies = [
-    "beautifulsoup4>=4.15.0",
-    "flask>=3.1.3",
-    "google-genai>=2.33.0",
-    "langchain-text-splitters>=1.1.3",
-    "numpy>=2.2.6",
-    "pydantic>=2.14.3",
-    "pymongo[srv]>=4.18.3",
-    "pymupdf>=1.28.2",
-    "python-docx>=1.2.0",
-    "python-dotenv>=1.2.4",
-    "python-pptx>=1.0.2",
-    "rank-bm25>=0.2.2",
-    "tenacity>=9.1.4",
+    "flask>=3.0",
+    "pymongo>=4.6",
+    "google-genai>=1.0",
+    "python-dotenv>=1.0",
+    "pymupdf>=1.24",
+    "langchain-text-splitters>=0.2",
 ]
 
-[project.scripts]
-advance-rag-project = "advance_rag_project:main"
-
-[build-system]
-requires = ["uv_build>=0.13.1,<0.14.0"]
-build-backend = "uv_build"
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff>=0.5"]

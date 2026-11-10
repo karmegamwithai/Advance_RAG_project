@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Advance RAG — Document Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui"] },
+          colors: {
+            ink: "#171923",
+            muted: "#737887",
+            line: "#e9eaf0",
+            violet: { 25: "#faf9ff", 50: "#f4f1ff", 100: "#e9e3ff", 500: "#8065e8", 600: "#6d50d8", 700: "#583dbb" }
+          },
+          boxShadow: {
+            soft: "0 12px 40px rgba(26, 24, 50, .06)",
+            panel: "0 2px 12px rgba(26, 24, 50, .04)"
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-[#f7f7fb] font-sans text-ink">
+  <div class="flex min-h-screen">
+    <aside class="hidden w-72 shrink-0 flex-col border-r border-line bg-white lg:flex">
+      <div class="flex items-center gap-3 px-6 py-6">
+        <div class="grid h-10 w-10 place-items-center rounded-xl bg-violet-600 text-white shadow-lg shadow-violet-200">
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3.8h7l4 4V20a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 20V5.3A1.5 1.5 0 0 1 7.5 3.8Z"/><path d="M14 4v4h4M9 13h6M9 16.5h6"/></svg>
+        </div>
+        <div><p class="text-[15px] font-extrabold tracking-tight">Advance RAG</p><p class="text-[11px] text-muted">DOCUMENT INTELLIGENCE</p></div>
+      </div>
+
+      <div class="px-4 pt-5">
+        <p class="px-3 pb-3 text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Workspace</p>
+        <button id="newChatBtn" class="flex w-full items-center gap-3 rounded-xl bg-violet-50 px-3 py-3 text-sm font-semibold text-violet-700">
+          <span class="text-lg">＋</span> New conversation
+        </button>
+      </div>
+
+      <div class="mt-8 px-4">
+        <div class="flex items-center justify-between px-3 pb-3">
+          <p class="text-[10px] font-bold uppercase tracking-[.16em] text-slate-400">Your documents</p>
+          <span id="docCount" class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">0</span>
+        </div>
+        <div id="documentList" class="space-y-1">
+          <p class="px-3 py-3 text-xs leading-5 text-slate-400">Your uploaded PDFs will appear here.</p>
+        </div>
+      </div>
+
+      <div class="mt-auto border-t border-line p-4">
+        <button id="settingsOpen" class="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-slate-600 hover:bg-slate-50">
+          <span>⚙</span> API settings
+        </button>
+        <div class="mt-3 flex items-center justify-between rounded-xl bg-slate-50 p-3">
+          <div class="min-w-0"><p id="accountLabel" class="truncate text-xs font-semibold">Not signed in</p><p class="text-[10px] text-slate-400">Personal workspace</p></div>
+          <button id="logoutBtn" class="hidden text-xs font-semibold text-slate-500 hover:text-rose-600">Logout</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex min-w-0 flex-1 flex-col">
+      <header class="flex h-[70px] items-center justify-between border-b border-line bg-white/90 px-5 backdrop-blur md:px-8">
+        <div class="flex items-center gap-3">
+          <div class="grid h-9 w-9 place-items-center rounded-lg bg-violet-600 text-sm font-bold text-white lg:hidden">A</div>
+          <div><p class="text-sm font-bold">Document assistant</p><p class="text-[11px] text-muted">Ask questions across your knowledge base</p></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="hidden items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 sm:flex"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Gemini + MongoDB</span>
+          <button id="mobileSettings" class="rounded-lg border border-line px-3 py-2 text-xs font-semibold text-slate-600 lg:hidden">Settings</button>
+        </div>
+      </header>
+
+      <section class="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-6 md:px-8">
+        <div id="welcomePanel" class="my-auto">
+          <div class="mx-auto max-w-2xl text-center">
+            <div class="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-2xl bg-violet-100 text-2xl">✦</div>
+            <p class="mb-2 text-xs font-bold uppercase tracking-[.2em] text-violet-600">Your AI knowledge space</p>
+            <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Chat with your <span class="text-violet-600">documents.</span></h1>
+            <p class="mx-auto mt-4 max-w-lg text-sm leading-6 text-muted">Upload a PDF, index it with Gemini embeddings, and ask questions. Answers are grounded in your documents with source references.</p>
+          </div>
+
+          <div class="mx-auto mt-9 grid max-w-3xl gap-4 md:grid-cols-2">
+            <div class="rounded-2xl border border-line bg-white p-5 shadow-panel">
+              <div class="mb-4 flex items-center justify-between"><div class="grid h-10 w-10 place-items-center rounded-xl bg-rose-50 text-xl">📄</div><span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Step 01</span></div>
+              <h3 class="font-bold">Upload your PDF</h3><p class="mt-1 text-xs leading-5 text-muted">Extract, split and embed document content.</p>
+              <label class="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-violet-200 bg-violet-25 px-4 py-3 text-xs font-semibold text-violet-700 hover:bg-violet-50">
+                <span>＋ Choose PDF</span><input id="pdfInput" type="file" accept="application/pdf,.pdf" class="hidden">
+              </label>
+              <p id="uploadStatus" class="mt-2 min-h-4 text-[11px] text-muted"></p>
+            </div>
+            <div class="rounded-2xl border border-line bg-white p-5 shadow-panel">
+              <div class="mb-4 flex items-center justify-between"><div class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-xl">🔑</div><span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Step 02</span></div>
+              <h3 class="font-bold">Connect Gemini</h3><p class="mt-1 text-xs leading-5 text-muted">Add your Gemini API key in settings to enable embeddings and chat.</p>
+              <button id="configureKeyBtn" class="mt-4 w-full rounded-xl border border-line px-4 py-3 text-xs font-semibold text-slate-700 hover:bg-slate-50">Configure API key →</button>
+            </div>
+          </div>
+          <div class="mx-auto mt-5 max-w-3xl rounded-2xl border border-line bg-white p-4">
+            <div class="flex items-center gap-3"><span class="grid h-9 w-9 place-items-center rounded-lg bg-slate-50">💬</span><div><p class="text-xs font-bold">Ready to ask questions?</p><p class="text-[11px] text-muted">Your indexed documents will be available in this chat.</p></div></div>
+          </div>
+        </div>
+
+        <div id="chatPanel" class="hidden flex-1 flex-col">
+          <div id="messages" class="flex-1 space-y-5 pb-6"></div>
+        </div>
+
+        <div class="sticky bottom-0 mt-6 bg-[#f7f7fb] pb-2 pt-3">
+          <div class="rounded-2xl border border-line bg-white p-3 shadow-soft">
+            <textarea id="questionInput" rows="2" placeholder="Ask anything about your uploaded documents..." class="max-h-36 w-full resize-none border-0 bg-transparent px-2 py-1 text-sm outline-none placeholder:text-slate-400" disabled></textarea>
+            <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+              <p id="chatHint" class="text-[10px] text-slate-400">Upload a PDF and configure your Gemini API key to get started.</p>
+              <button id="sendBtn" disabled class="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-violet-200 transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-40">Send <span>↑</span></button>
+            </div>
+          </div>
+          <p class="mt-2 text-center text-[10px] text-slate-400">AI responses can make mistakes. Verify important information against the original document.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Auth modal -->
+  <div id="authModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-3xl bg-white p-7 shadow-2xl">
+      <div class="mb-6 flex items-center justify-between"><div><p class="text-xl font-extrabold">Welcome to Advance RAG</p><p class="mt-1 text-xs text-muted">Sign in to your private workspace.</p></div><button data-close="authModal" class="text-xl text-slate-400">×</button></div>
+      <div class="mb-5 grid grid-cols-2 rounded-xl bg-slate-100 p-1"><button id="loginTab" class="rounded-lg bg-white py-2 text-xs font-bold shadow-sm">Sign in</button><button id="registerTab" class="rounded-lg py-2 text-xs font-semibold text-slate-500">Create account</button></div>
+      <form id="authForm" class="space-y-3">
+        <input id="authEmail" type="email" required placeholder="Email address" class="w-full rounded-xl border border-line px-4 py-3 text-sm outline-none focus:border-violet-400">
+        <input id="authPassword" type="password" required minlength="8" placeholder="Password (at least 8 characters)" class="w-full rounded-xl border border-line px-4 py-3 text-sm outline-none focus:border-violet-400">
+        <p id="authError" class="text-xs text-rose-600"></p>
+        <button class="w-full rounded-xl bg-violet-600 py-3 text-sm font-bold text-white hover:bg-violet-700">Continue</button>
+      </form>
+      <p class="mt-4 text-center text-[10px] leading-5 text-slate-400">Your account is used to isolate your documents and chat requests.</p>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div id="settingsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-md rounded-3xl bg-white p-7 shadow-2xl">
+      <div class="mb-5 flex items-start justify-between"><div><p class="text-xl font-extrabold">Gemini API settings</p><p class="mt-1 text-xs leading-5 text-muted">Your key is sent to the Flask backend for validation.</p></div><button data-close="settingsModal" class="text-xl text-slate-400">×</button></div>
+      <form id="keyForm" class="space-y-3">
+        <label class="text-xs font-semibold text-slate-600" for="apiKey">Gemini API key</label>
+        <input id="apiKey" type="password" required autocomplete="off" placeholder="Paste your Gemini API key" class="w-full rounded-xl border border-line px-4 py-3 text-sm outline-none focus:border-violet-400">
+        <p class="text-[11px] leading-5 text-slate-400">For this starter app, a user-provided key is held in server memory and is cleared when the server restarts. Do not use this key-handling approach for production.</p>
+        <p id="keyStatus" class="text-xs"></p>
+        <button class="w-full rounded-xl bg-violet-600 py-3 text-sm font-bold text-white hover:bg-violet-700">Validate and save key</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="pointer-events-none fixed bottom-5 right-5 z-[60] hidden max-w-sm rounded-xl bg-slate-900 px-4 py-3 text-xs font-medium text-white shadow-xl"></div>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
